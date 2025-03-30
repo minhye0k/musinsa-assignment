@@ -6,3 +6,4 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
 }
 
+bootJar.enabled=false
