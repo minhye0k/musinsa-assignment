@@ -1,13 +1,13 @@
-package com.musinsa.product;
+package com.musinsa.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MusinsaAssignmentApplication {
+public class AppApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(MusinsaAssignmentApplication.class, args);
+        SpringApplication.run(AppApplication.class, args);
     }
 
 }

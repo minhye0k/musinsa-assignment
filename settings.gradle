@@ -1,1 +1,5 @@
-rootProject.name = 'product'
+rootProject.name = 'musinsa'
+
+include 'app'
+include 'product'
+include 'core'
