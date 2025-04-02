@@ -1,6 +1,6 @@
 package com.musinsa.app.api;
 
-import com.musinsa.app.api.response.LowestProductsResponse;
+import com.musinsa.app.api.response.LowestProductsByCategoryResponse;
 import com.musinsa.product.ProductService;
 import com.musinsa.product.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +17,11 @@ import java.util.List;
 public class ProductController {
     private final ProductService productService;
 
-    @GetMapping("lowest")
-    public ResponseEntity<LowestProductsResponse> lowest() {
+    @GetMapping("lowest-by-category")
+    public ResponseEntity<LowestProductsByCategoryResponse> lowestByCategory() {
         List<ProductDto> lowestProductsByCategory = productService.getLowestProductsByCategory();
         long totalPrice = lowestProductsByCategory.stream().mapToLong(ProductDto::price).sum();
 
-        return ResponseEntity.ok(LowestProductsResponse.from(lowestProductsByCategory, totalPrice));
+        return ResponseEntity.ok(LowestProductsByCategoryResponse.from(lowestProductsByCategory, totalPrice));
     }
 }
