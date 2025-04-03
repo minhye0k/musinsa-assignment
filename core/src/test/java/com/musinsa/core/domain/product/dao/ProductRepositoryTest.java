@@ -14,19 +14,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 
 @RepositoryTest
-public class ProductRepositoryTest {
+class ProductRepositoryTest {
     @Autowired
-    private ProductRepository productRepository;
+    ProductRepository productRepository;
 
     @Test
     @DisplayName("카테고리별 최저가 상품들이 조회되어야 한다.")
     public void getLowestProductsByCategory(){
         //given
-        Category testCategory1 = Category.builder()
-                .name("카테고리1")
-                .build();
         Category testCategory2 = Category.builder()
                 .name("카테고리2")
+                .build();
+        Category testCategory1 = Category.builder()
+                .name("카테고리1")
                 .build();
 
         Brand testBrand = Brand.builder()

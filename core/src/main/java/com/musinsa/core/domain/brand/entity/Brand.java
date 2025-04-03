@@ -5,6 +5,7 @@ import com.musinsa.core.domain.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,5 +23,14 @@ public class Brand extends BaseTime {
     private String name;
 
     @OneToMany(mappedBy = "brand")
-    private List<Product> products;
+    @Builder.Default
+    private List<Product> products = new ArrayList<>();
+
+    public void update(String name){
+        this.name = name;
+    }
+
+    public boolean hasProduct(){
+        return !this.products.isEmpty();
+    }
 }

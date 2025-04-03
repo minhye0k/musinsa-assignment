@@ -1,5 +1,6 @@
 package com.musinsa.product;
 
+import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
 import com.musinsa.core.domain.category.dao.CategoryRepository;
 import com.musinsa.core.domain.category.entity.Category;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final BrandRepository brandRepository;
 
     public List<ProductDto> getLowestProductsByCategory() {
         List<Product> products = productRepository.getLowestProductsByCategory(ProductQueryParam.empty());
@@ -135,5 +137,51 @@ public class ProductService {
         List<Product> highestProductsByCategory = productRepository.getHighestProductsByCategory(productQueryParam);
 
         return highestProductsByCategory.stream().map(ProductDto::from).toList();
+    }
+
+    @Transactional
+    public Long create(ProductDto productDto) {
+        String brandName = productDto.brand();
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseThrow(() -> new RuntimeException("지정하신 브랜드를 찾을 수 없습니다."));
+
+        String categoryName = productDto.category();
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new RuntimeException("지정하신 카테고리를 찾을 수 없습니다."));
+
+        Product product = Product.builder()
+                .brand(brand)
+                .price(productDto.price())
+                .category(category)
+                .build();
+
+        Product savedProduct = productRepository.save(product);
+        return savedProduct.getSeq();
+    }
+
+    @Transactional
+    public Long update(Long seq, ProductDto productDto) {
+        Product product = productRepository.findById(seq)
+                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다."));
+
+        String brandName = productDto.brand();
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseThrow(() -> new RuntimeException("지정하신 브랜드를 찾을 수 없습니다."));
+
+        String categoryName = productDto.category();
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new RuntimeException("지정하신 카테고리를 찾을 수 없습니다."));
+
+        product.update(brand, category, productDto.price());
+        return product.getSeq();
+    }
+
+    @Transactional
+    public Long delete(Long seq) {
+        Product product = productRepository.findById(seq)
+                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다."));
+
+        productRepository.delete(product);
+        return product.getSeq();
     }
 }

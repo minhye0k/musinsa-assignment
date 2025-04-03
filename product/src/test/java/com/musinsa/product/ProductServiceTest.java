@@ -1,5 +1,6 @@
 package com.musinsa.product;
 
+import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
 import com.musinsa.core.domain.category.dao.CategoryRepository;
 import com.musinsa.core.domain.category.entity.Category;
@@ -35,6 +36,8 @@ class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private BrandRepository brandRepository;
 
     @Test
     @DisplayName("카테고리 별 최저가 상품 목록이 반환되어야 한다.")
@@ -335,5 +338,171 @@ class ProductServiceTest {
                 .isThrownBy(() -> productService.getHighestProductsByCategory(any()))
                 .withMessage("해당 카테고리를 찾을 수 없습니다.");
 
+    }
+
+    @Test
+    @DisplayName("상품을 등록한다.")
+    void create() {
+        //given
+        Category testCategory = Category.builder()
+                .seq(1L)
+                .name("카테고리1")
+                .build();
+        Brand testBrand = Brand.builder()
+                .name("브랜드1")
+                .build();
+        Product testProduct = Product.builder()
+                .seq(1L)
+                .category(testCategory)
+                .brand(testBrand)
+                .price(1000)
+                .build();
+
+        ProductDto productDto = ProductDto.from(testProduct);
+
+        given(categoryRepository.findByName(any())).willReturn(Optional.of(testCategory));
+        given(brandRepository.findByName(any())).willReturn(Optional.of(testBrand));
+        given(productRepository.save(any())).willReturn(testProduct);
+
+        //when
+        Long result = productService.create(productDto);
+
+        //then
+        assertThat(result).isEqualTo(testProduct.getSeq());
+    }
+
+    @Test
+    @DisplayName("입력 받은 브랜드가 존재하지 않으면 예외가 발생한다.")
+    void createBrandNotFoundException() {
+        //given
+        ProductDto productDto = ProductDto.builder().build();
+
+        given(brandRepository.findByName(any())).willReturn(Optional.empty());
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.create(productDto))
+                .withMessage("지정하신 브랜드를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("입력 받은 카테고리가 존재하지 않으면 예외가 발생한다.")
+    void createCategoryNotFoundException() {
+        //given
+        ProductDto productDto = ProductDto.builder().build();
+
+        given(brandRepository.findByName(any())).willReturn(Optional.of(Brand.builder().build()));
+        given(categoryRepository.findByName(any())).willReturn(Optional.empty());
+
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.create(productDto))
+                .withMessage("지정하신 카테고리를 찾을 수 없습니다.");
+    }
+
+
+    @Test
+    @DisplayName("상품을 수정한다.")
+    void update() {
+        //given
+        Category testCategory = Category.builder()
+                .seq(1L)
+                .name("카테고리1")
+                .build();
+        Brand testBrand = Brand.builder()
+                .name("브랜드1")
+                .build();
+        Product testProduct = Product.builder()
+                .seq(1L)
+                .category(testCategory)
+                .brand(testBrand)
+                .price(1000)
+                .build();
+
+        ProductDto productDto = ProductDto.from(testProduct);
+
+        final Long seq = testProduct.getSeq();
+
+        given(productRepository.findById(seq)).willReturn(Optional.of(testProduct));
+        given(categoryRepository.findByName(any())).willReturn(Optional.of(testCategory));
+        given(brandRepository.findByName(any())).willReturn(Optional.of(testBrand));
+
+        //when
+        Long result = productService.update(seq, productDto);
+
+        //then
+        assertThat(result).isEqualTo(seq);
+
+    }
+
+    @Test
+    @DisplayName("입력 받은 상품이 존재하지 않으면 예외가 발생한다.")
+    void updateProductNotFoundException() {
+        //given
+        ProductDto productDto = ProductDto.builder().build();
+        given(productRepository.findById(any())).willReturn(Optional.empty());
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.update(1L, productDto))
+                .withMessage("해당 상품을 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("입력 받은 브랜드가 존재하지 않으면 예외가 발생한다.")
+    void updateBrandNotFoundException() {
+        //given
+        ProductDto productDto = ProductDto.builder().build();
+
+        given(productRepository.findById(any())).willReturn(Optional.of(Product.builder().build()));
+        given(brandRepository.findByName(any())).willReturn(Optional.empty());
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.update(1L, productDto))
+                .withMessage("지정하신 브랜드를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("입력 받은 카테고리가 존재하지 않으면 예외가 발생한다.")
+    void updateCategoryNotFoundException() {
+        //given
+        ProductDto productDto = ProductDto.builder().build();
+
+        given(productRepository.findById(any())).willReturn(Optional.of(Product.builder().build()));
+        given(brandRepository.findByName(any())).willReturn(Optional.of(Brand.builder().build()));
+        given(categoryRepository.findByName(any())).willReturn(Optional.empty());
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.update(1L, productDto))
+                .withMessage("지정하신 카테고리를 찾을 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("상품을 삭제한다.")
+    void delete() {
+        //given
+        long seq = 1L;
+        given(productRepository.findById(any())).willReturn(Optional.of(Product.builder().seq(seq).build()));
+
+        //when
+        Long result = productService.delete(seq);
+
+        //then
+        assertThat(result).isEqualTo(seq);
+    }
+
+    @Test
+    @DisplayName("삭제하려는 상품이 존재하지 않으면 예외가 발생한다.")
+    void deleteProductNotFoundException() {
+        //given
+        given(productRepository.findById(any())).willReturn(Optional.empty());
+
+        //when & then
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> productService.delete(any()))
+                .withMessage("해당 상품을 찾을 수 없습니다.");
     }
 }

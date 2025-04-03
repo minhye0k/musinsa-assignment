@@ -30,4 +30,10 @@ public class Product extends BaseTime {
     @JoinColumn(name = "brand_seq", referencedColumnName = "seq", nullable = false)
     private Brand brand;
 
+    public void update(Brand brand, Category category, Long price) {
+        this.brand = brand;
+        this.category = category;
+        this.price = price;
+    }
+
 }
