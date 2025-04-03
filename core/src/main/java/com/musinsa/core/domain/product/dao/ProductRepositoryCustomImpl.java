@@ -35,4 +35,23 @@ public class ProductRepositoryCustomImpl implements ProductRepositoryCustom {
                 ))
                 .fetch();
     }
+
+    @Override
+    public List<Product> getLowestProductsByBrandAndCategory() {
+        QProduct subProduct = new QProduct("subProduct");
+
+        return queryFactory.select(product)
+                .from(product)
+                .join(product.brand, brand).fetchJoin()
+                .join(product.category, category).fetchJoin()
+                .where(Expressions.list(brand.seq, category.seq, product.price).in(
+                        JPAExpressions
+                                .select(brand.seq, category.seq, subProduct.price.min())
+                                .from(subProduct)
+                                .join(subProduct.category, category)
+                                .join(subProduct.brand, brand)
+                                .groupBy(brand.seq, category.seq)
+                ))
+                .fetch();
+    }
 }

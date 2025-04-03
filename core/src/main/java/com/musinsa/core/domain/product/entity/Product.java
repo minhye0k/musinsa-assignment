@@ -13,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode(callSuper = true)
 public class Product extends BaseTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

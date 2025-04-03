@@ -1,7 +1,9 @@
 package com.musinsa.app.api;
 
+import com.musinsa.app.api.response.LowestProductsByBrandResponse;
 import com.musinsa.app.api.response.LowestProductsByCategoryResponse;
 import com.musinsa.product.ProductService;
+import com.musinsa.product.dto.LowestBrandProductsDto;
 import com.musinsa.product.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,5 +25,13 @@ public class ProductController {
         long totalPrice = lowestProductsByCategory.stream().mapToLong(ProductDto::price).sum();
 
         return ResponseEntity.ok(LowestProductsByCategoryResponse.from(lowestProductsByCategory, totalPrice));
+    }
+
+    @GetMapping("lowest-by-brand")
+    public ResponseEntity<LowestProductsByBrandResponse> lowestByBrand() {
+        LowestBrandProductsDto lowestProductsByBrand = productService.getLowestProductsByBrand();
+        long totalPrice = lowestProductsByBrand.productDtos().stream().mapToLong(ProductDto::price).sum();
+
+        return ResponseEntity.ok(LowestProductsByBrandResponse.from(lowestProductsByBrand, totalPrice));
     }
 }

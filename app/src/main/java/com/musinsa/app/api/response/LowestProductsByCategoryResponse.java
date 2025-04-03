@@ -20,9 +20,9 @@ public record LowestProductsByCategoryResponse(@JsonProperty("최저가") List<P
     }
 
     @Builder
-    record Product(@JsonProperty("카테고리") String category,
-                   @JsonProperty("브랜드") String brand,
-                   @JsonProperty("가격") long price) {
+    private record Product(@JsonProperty("카테고리") String category,
+                           @JsonProperty("브랜드") String brand,
+                           @JsonProperty("가격") long price) {
 
         public static Product from(ProductDto productDto) {
             return Product.builder()
