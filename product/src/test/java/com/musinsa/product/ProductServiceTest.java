@@ -1,5 +1,6 @@
 package com.musinsa.product;
 
+import com.musinsa.common.exception.CustomException;
 import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
 import com.musinsa.core.domain.category.dao.CategoryRepository;
@@ -235,9 +236,9 @@ class ProductServiceTest {
         given(categoryRepository.count()).willReturn(2L);
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.getLowestProductsByBrand())
-                .withMessage("lowest brand not found");
+                .withMessage("최저가 브랜드를 찾을 수 없습니다.");
     }
 
     @Test
@@ -284,7 +285,7 @@ class ProductServiceTest {
         given(categoryRepository.existsByName(any())).willReturn(false);
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.getLowestProductsByCategory(any()))
                 .withMessage("해당 카테고리를 찾을 수 없습니다.");
 
@@ -334,7 +335,7 @@ class ProductServiceTest {
         given(categoryRepository.existsByName(any())).willReturn(false);
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.getHighestProductsByCategory(any()))
                 .withMessage("해당 카테고리를 찾을 수 없습니다.");
 
@@ -380,7 +381,7 @@ class ProductServiceTest {
         given(brandRepository.findByName(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.create(productDto))
                 .withMessage("지정하신 브랜드를 찾을 수 없습니다.");
     }
@@ -396,7 +397,7 @@ class ProductServiceTest {
 
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.create(productDto))
                 .withMessage("지정하신 카테고리를 찾을 수 없습니다.");
     }
@@ -444,7 +445,7 @@ class ProductServiceTest {
         given(productRepository.findById(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.update(1L, productDto))
                 .withMessage("해당 상품을 찾을 수 없습니다.");
     }
@@ -459,7 +460,7 @@ class ProductServiceTest {
         given(brandRepository.findByName(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.update(1L, productDto))
                 .withMessage("지정하신 브랜드를 찾을 수 없습니다.");
     }
@@ -475,7 +476,7 @@ class ProductServiceTest {
         given(categoryRepository.findByName(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.update(1L, productDto))
                 .withMessage("지정하신 카테고리를 찾을 수 없습니다.");
     }
@@ -501,7 +502,7 @@ class ProductServiceTest {
         given(productRepository.findById(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> productService.delete(any()))
                 .withMessage("해당 상품을 찾을 수 없습니다.");
     }

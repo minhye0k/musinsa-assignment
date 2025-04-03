@@ -1,5 +1,6 @@
 package com.musinsa.product;
 
+import com.musinsa.common.exception.CustomException;
 import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
 import com.musinsa.core.domain.category.dao.CategoryRepository;
@@ -109,14 +110,14 @@ public class ProductService {
             }
         }
 
-        if (lowestBrandSeq == 0) throw new RuntimeException("lowest brand not found");
+        if (lowestBrandSeq == 0) throw CustomException.notFound("최저가 브랜드를 찾을 수 없습니다.");
 
         return lowestBrandSeq;
     }
 
     public List<ProductDto> getLowestProductsByCategory(String category) {
         boolean categoryExist = categoryRepository.existsByName(category);
-        if(!categoryExist) throw new RuntimeException("해당 카테고리를 찾을 수 없습니다.");
+        if(!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
 
         ProductQueryParam productQueryParam = ProductQueryParam.builder()
                 .categoryName(category)
@@ -129,7 +130,7 @@ public class ProductService {
 
     public List<ProductDto> getHighestProductsByCategory(String category) {
         boolean categoryExist = categoryRepository.existsByName(category);
-        if(!categoryExist) throw new RuntimeException("해당 카테고리를 찾을 수 없습니다.");
+        if(!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
 
         ProductQueryParam productQueryParam = ProductQueryParam.builder()
                 .categoryName(category)
@@ -143,11 +144,11 @@ public class ProductService {
     public Long create(ProductDto productDto) {
         String brandName = productDto.brand();
         Brand brand = brandRepository.findByName(brandName)
-                .orElseThrow(() -> new RuntimeException("지정하신 브랜드를 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("지정하신 브랜드를 찾을 수 없습니다."));
 
         String categoryName = productDto.category();
         Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new RuntimeException("지정하신 카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("지정하신 카테고리를 찾을 수 없습니다."));
 
         Product product = Product.builder()
                 .brand(brand)
@@ -162,15 +163,15 @@ public class ProductService {
     @Transactional
     public Long update(Long seq, ProductDto productDto) {
         Product product = productRepository.findById(seq)
-                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("해당 상품을 찾을 수 없습니다."));
 
         String brandName = productDto.brand();
         Brand brand = brandRepository.findByName(brandName)
-                .orElseThrow(() -> new RuntimeException("지정하신 브랜드를 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("지정하신 브랜드를 찾을 수 없습니다."));
 
         String categoryName = productDto.category();
         Category category = categoryRepository.findByName(categoryName)
-                .orElseThrow(() -> new RuntimeException("지정하신 카테고리를 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("지정하신 카테고리를 찾을 수 없습니다."));
 
         product.update(brand, category, productDto.price());
         return product.getSeq();
@@ -179,7 +180,7 @@ public class ProductService {
     @Transactional
     public Long delete(Long seq) {
         Product product = productRepository.findById(seq)
-                .orElseThrow(() -> new RuntimeException("해당 상품을 찾을 수 없습니다."));
+                .orElseThrow(() -> CustomException.notFound("해당 상품을 찾을 수 없습니다."));
 
         productRepository.delete(product);
         return product.getSeq();

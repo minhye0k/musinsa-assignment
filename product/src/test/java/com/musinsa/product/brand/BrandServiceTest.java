@@ -1,5 +1,6 @@
 package com.musinsa.product.brand;
 
+import com.musinsa.common.exception.CustomException;
 import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
 import com.musinsa.core.domain.product.entity.Product;
@@ -57,7 +58,7 @@ class BrandServiceTest {
         given(brandRepository.existsByName(any())).willReturn(true);
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> brandService.create(BrandDto.builder().build()))
                 .withMessage("이미 존재하는 브랜드 명입니다.");
     }
@@ -94,7 +95,7 @@ class BrandServiceTest {
         given(brandRepository.existsByName(any())).willReturn(true);
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> brandService.update(1L, BrandDto.builder().build()))
                 .withMessage("이미 존재하는 브랜드 명입니다.");
     }
@@ -127,7 +128,7 @@ class BrandServiceTest {
         given(brandRepository.findBySeqWithProducts(any())).willReturn(Optional.empty());
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() ->brandService.delete(any()))
                 .withMessage("해당 브랜드를 찾을 수 없습니다.");
     }
@@ -149,7 +150,7 @@ class BrandServiceTest {
         given(brandRepository.findBySeqWithProducts(any())).willReturn(Optional.of(testBrand));
 
         //when & then
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(CustomException.class)
                 .isThrownBy(() -> brandService.delete(any()))
                 .withMessage("상품이 있는 브랜드는 삭제할 수 없습니다.");
     }

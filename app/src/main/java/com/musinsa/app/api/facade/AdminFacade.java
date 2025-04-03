@@ -2,6 +2,7 @@ package com.musinsa.app.api.facade;
 
 import com.musinsa.app.api.request.ManageProductRequest;
 import com.musinsa.app.api.response.ManageProductResponse;
+import com.musinsa.common.exception.CustomException;
 import com.musinsa.product.brand.BrandService;
 import com.musinsa.product.brand.dto.BrandDto;
 import com.musinsa.product.ProductService;
@@ -31,7 +32,7 @@ public class AdminFacade {
                     Long brandSeq = brandService.create(brandDto);
                     message = String.format("%s (고유번호 : %s) 브랜드가 생성되었습니다.", brandDto.name(), brandSeq);
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw CustomException.badRequest("지원하지 않는 관리 대상입니다.");
                 }
                 break;
             }
@@ -43,7 +44,7 @@ public class AdminFacade {
                     String brandName = brandService.update(brand.seq(), brand.toBrandDto());
                     message = String.format("%s 브랜드 정보가 수정되었습니다.", brandName);
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw CustomException.badRequest("지원하지 않는 관리 대상입니다.");
                 }
                 break;
             }
@@ -55,12 +56,12 @@ public class AdminFacade {
                     String brandName = brandService.delete(brand.seq());
                     message = String.format("%s 브랜드가 삭제되었습니다.", brandName);
                 } else {
-                    throw new UnsupportedOperationException();
+                    throw CustomException.badRequest("지원하지 않는 관리 대상입니다.");
                 }
                 break;
             }
             default:
-                throw new UnsupportedOperationException();
+                throw CustomException.badRequest("지원하지 않는 기능입니다.");
         }
 
         return ManageProductResponse.builder()
