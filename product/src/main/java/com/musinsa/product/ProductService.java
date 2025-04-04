@@ -1,5 +1,6 @@
 package com.musinsa.product;
 
+import com.musinsa.common.config.CacheType;
 import com.musinsa.common.exception.CustomException;
 import com.musinsa.core.domain.brand.dao.BrandRepository;
 import com.musinsa.core.domain.brand.entity.Brand;
@@ -13,6 +14,10 @@ import com.musinsa.product.dto.LowestBrandProductsDto;
 import com.musinsa.product.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +33,9 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final BrandRepository brandRepository;
 
+    @Cacheable(cacheNames = "lowestProductsByCategory")
     public List<ProductDto> getLowestProductsByCategory() {
+
         List<Product> products = productRepository.getLowestProductsByCategory(ProductQueryParam.empty());
 
         List<Product> dedupedProducts = dedupeByCategory(products);
@@ -51,7 +58,7 @@ public class ProductService {
         return productByCategory.values().stream().toList();
     }
 
-
+    @Cacheable(cacheNames = "lowestProductsByBrand")
     public LowestBrandProductsDto getLowestProductsByBrand() {
         List<Product> products = productRepository.getLowestProductsByBrandAndCategory();
 
@@ -120,9 +127,10 @@ public class ProductService {
         return lowestBrandSeq;
     }
 
+    @Cacheable(cacheNames = "lowestProduct", key = "#category")
     public List<ProductDto> getLowestProductsByCategory(String category) {
         boolean categoryExist = categoryRepository.existsByName(category);
-        if(!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
+        if (!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
 
         ProductQueryParam productQueryParam = ProductQueryParam.builder()
                 .categoryName(category)
@@ -133,9 +141,10 @@ public class ProductService {
 
     }
 
+    @Cacheable(cacheNames = "highestProduct", key = "#category")
     public List<ProductDto> getHighestProductsByCategory(String category) {
         boolean categoryExist = categoryRepository.existsByName(category);
-        if(!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
+        if (!categoryExist) throw CustomException.notFound("해당 카테고리를 찾을 수 없습니다.");
 
         ProductQueryParam productQueryParam = ProductQueryParam.builder()
                 .categoryName(category)
@@ -145,6 +154,12 @@ public class ProductService {
         return highestProductsByCategory.stream().map(ProductDto::from).toList();
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = {"lowestProductsByCategory", "lowestProductsByBrand"}),
+                    @CacheEvict(cacheNames = {"lowestProduct", "highestProduct"}, key = "#productDto.category")
+            }
+    )
     @Transactional
     public Long create(ProductDto productDto) {
         String brandName = productDto.brand();
@@ -165,6 +180,12 @@ public class ProductService {
         return savedProduct.getSeq();
     }
 
+    @Caching(
+            evict = {
+                    @CacheEvict(cacheNames = {"lowestProductsByCategory", "lowestProductsByBrand"}),
+                    @CacheEvict(cacheNames = {"lowestProduct", "highestProduct"}, key = "#productDto.category")
+            }
+    )
     @Transactional
     public Long update(Long seq, ProductDto productDto) {
         Product product = productRepository.findById(seq)
@@ -182,6 +203,7 @@ public class ProductService {
         return product.getSeq();
     }
 
+    @CacheEvict(cacheNames = {"lowestProductsByCategory", "lowestProductsByBrand", "lowestProduct", "highestProduct"}, allEntries = true)
     @Transactional
     public Long delete(Long seq) {
         Product product = productRepository.findById(seq)

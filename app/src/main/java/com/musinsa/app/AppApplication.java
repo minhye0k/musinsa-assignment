@@ -3,7 +3,7 @@ package com.musinsa.app;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = {"com.musinsa.app", "com.musinsa.product", "com.musinsa.core"})
+@SpringBootApplication(scanBasePackages = {"com.musinsa.app", "com.musinsa.product", "com.musinsa.core", "com.musinsa.common"})
 public class AppApplication {
 
     public static void main(String[] args) {
