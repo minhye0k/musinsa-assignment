@@ -58,7 +58,12 @@ public class ProductService {
         List<Product> dedupedProducts = dedupeByBrandAndCategory(products);
         Long lowestBrandSeq = getLowestBrandSeq(dedupedProducts);
 
-        List<ProductDto> lowestProducts = dedupedProducts.stream().filter(p -> p.getBrand().getSeq().equals(lowestBrandSeq)).map(ProductDto::from).toList();
+        List<ProductDto> lowestProducts = dedupedProducts.stream()
+                .filter(p -> p.getBrand().getSeq().equals(lowestBrandSeq))
+                .sorted(Comparator.comparing(p -> p.getCategory().getSeq()))
+                .map(ProductDto::from)
+                .toList();
+
         String brand = lowestProducts.isEmpty() ? "" : lowestProducts.get(0).brand();
         return LowestBrandProductsDto.builder()
                 .productDtos(lowestProducts)
