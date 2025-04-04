@@ -1,3 +1,5 @@
 spring:
   profiles:
-    include: product, core
+    include: product, core, common
+
+

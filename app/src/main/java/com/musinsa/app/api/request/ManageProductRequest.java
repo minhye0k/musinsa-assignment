@@ -5,7 +5,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.musinsa.common.exception.CustomException;
 import com.musinsa.product.brand.dto.BrandDto;
 import com.musinsa.product.dto.ProductDto;
+import lombok.Builder;
 
+@Builder
 public record ManageProductRequest(Action action,
                                    Target target,
                                    Product product,
@@ -55,6 +57,7 @@ public record ManageProductRequest(Action action,
         }
     }
 
+    @Builder
     public record Brand(Long seq,
                         String name) {
 
@@ -76,6 +79,7 @@ public record ManageProductRequest(Action action,
         }
     }
 
+    @Builder
     public record Product(Long seq,
                           String brand,
                           String category,
